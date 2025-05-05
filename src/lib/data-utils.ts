@@ -1,7 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 
-export async function getAllPosts(): Promise<CollectionEntry<'blog'>[]> {
-  const posts = await getCollection('blog')
+export async function getAllPosts(): Promise<CollectionEntry<'posts'>[]> {
+  const posts = await getCollection('posts')
   return posts
     .filter((post) => !post.data.draft)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -9,14 +9,14 @@ export async function getAllPosts(): Promise<CollectionEntry<'blog'>[]> {
 
 export async function getRecentPosts(
   count: number,
-): Promise<CollectionEntry<'blog'>[]> {
+): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getAllPosts()
   return posts.slice(0, count)
 }
 
 export async function getAdjacentPosts(currentId: string): Promise<{
-  prev: CollectionEntry<'blog'> | null
-  next: CollectionEntry<'blog'> | null
+  prev: CollectionEntry<'posts'> | null
+  next: CollectionEntry<'posts'> | null
 }> {
   const posts = await getAllPosts()
   const currentIndex = posts.findIndex((post) => post.id === currentId)
@@ -69,12 +69,12 @@ export async function getSortedTags(): Promise<
 }
 
 export function groupPostsByYear(
-  posts: CollectionEntry<'blog'>[],
-): Record<string, CollectionEntry<'blog'>[]> {
+  posts: CollectionEntry<'posts'>[],
+): Record<string, CollectionEntry<'posts'>[]> {
   return posts.reduce(
-    (acc: Record<string, CollectionEntry<'blog'>[]>, post) => {
+    (acc: Record<string, CollectionEntry<'posts'>[]>, post) => {
       const year = post.data.date.getFullYear().toString()
-      ;(acc[year] ??= []).push(post)
+        ; (acc[year] ??= []).push(post)
       return acc
     },
     {},
@@ -101,14 +101,14 @@ export async function parseAuthors(authorIds: string[] = []) {
 
 export async function getPostsByAuthor(
   authorId: string,
-): Promise<CollectionEntry<'blog'>[]> {
+): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getAllPosts()
   return posts.filter((post) => post.data.authors?.includes(authorId))
 }
 
 export async function getPostsByTag(
   tag: string,
-): Promise<CollectionEntry<'blog'>[]> {
+): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getAllPosts()
   return posts.filter((post) => post.data.tags?.includes(tag))
 }
