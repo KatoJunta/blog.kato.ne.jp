@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { AUTHORS } from '@/consts'
 
 export async function getAllPosts(): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getCollection('posts')
@@ -84,17 +85,10 @@ export function groupPostsByYear(
 export async function parseAuthors(authorIds: string[] = []) {
   if (!authorIds.length) return []
 
-  const allAuthors = await getAllAuthors()
-  const authorMap = new Map(allAuthors.map((author) => [author.id, author]))
-
   return authorIds.map((id) => {
-    const author = authorMap.get(id)
-
     return {
       id,
-      name: author?.data?.name || id,
-      avatar: author?.data?.avatar || '/static/logo.png',
-      isRegistered: !!author,
+      name: AUTHORS[id as keyof typeof AUTHORS] || id,
     }
   })
 }
