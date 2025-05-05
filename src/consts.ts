@@ -6,7 +6,7 @@ export const SITE: Site = {
   href: 'https://blog.kato.ne.jp',
   author: 'Junta Kato',
   locale: 'ja-JP',
-  featuredPostCount: 3,
+  featuredPostCount: 4,
   postsPerPage: 5,
 }
 
