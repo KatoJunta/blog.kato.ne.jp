@@ -2,7 +2,7 @@ import type { IconMap, SocialLink, Site } from '@/types'
 
 export const SITE: Site = {
   title: '学びて厭わず',
-  description: 'XXXXXXXXXXXXX',
+  description: '雑多な書き物 authored by Junta Kato.',
   href: 'https://blog.kato.ne.jp',
   author: 'Junta Kato',
   locale: 'ja-JP',
