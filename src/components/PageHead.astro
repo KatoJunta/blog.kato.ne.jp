@@ -4,13 +4,18 @@ import { SITE } from '@/consts'
 interface Props {
   title?: string
   description?: string
+  isIndex?: boolean
 }
 
-const { title = SITE.title, description = SITE.description } = Astro.props
+const {
+  title = SITE.title,
+  description = SITE.description,
+  isIndex = false,
+} = Astro.props
 const image = new URL('/static/1200x630.png', Astro.site)
 ---
 
-<title>{`${title} | ${SITE.title}`}</title>
+<title>{isIndex ? SITE.title : `${title} | ${SITE.title}`}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={SITE.href} />
 

@@ -2,13 +2,12 @@ import type { IconMap, SocialLink, Site } from '@/types'
 
 export const SITE: Site = {
   title: '学びて厭わず',
-  description:
-    'XXXXXXXXXXXXX',
+  description: 'XXXXXXXXXXXXX',
   href: 'https://blog.kato.ne.jp',
   author: 'Junta Kato',
   locale: 'ja-JP',
-  featuredPostCount: 2,
-  postsPerPage: 3,
+  featuredPostCount: 3,
+  postsPerPage: 5,
 }
 
 export const NAV_LINKS: SocialLink[] = [
@@ -17,27 +16,19 @@ export const NAV_LINKS: SocialLink[] = [
     label: 'posts',
   },
   {
-    href: '/authors',
-    label: 'authors',
-  },
-  {
-    href: '/about',
-    label: 'about',
+    href: '/tags',
+    label: 'tags',
   },
 ]
 
 export const SOCIAL_LINKS: SocialLink[] = [
   {
-    href: 'https://github.com/jktrn',
+    href: 'https://x.com/KatoJunta',
+    label: 'X',
+  },
+  {
+    href: 'https://github.com/KatoJunta',
     label: 'GitHub',
-  },
-  {
-    href: 'https://twitter.com/enscry',
-    label: 'Twitter',
-  },
-  {
-    href: 'mailto:jason@enscribe.dev',
-    label: 'Email',
   },
   {
     href: '/rss.xml',
@@ -49,7 +40,7 @@ export const ICON_MAP: IconMap = {
   Website: 'lucide:globe',
   GitHub: 'lucide:github',
   LinkedIn: 'lucide:linkedin',
-  Twitter: 'lucide:twitter',
+  X: 'fa6-brands:x-twitter',
   Email: 'lucide:mail',
   RSS: 'lucide:rss',
 }
