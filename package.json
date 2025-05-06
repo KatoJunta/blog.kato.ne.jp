@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "gen:ogp": "tsx scripts/gen-ogp.tsx",
+    "prebuild": "npm run gen:ogp",
     "build": "astro check && astro build && npx pagefind --site dist --glob \"posts/**/*.html\"",
     "preview": "astro preview",
     "astro": "astro",
@@ -50,11 +52,14 @@
     "typescript": "^5.7.3"
   },
   "devDependencies": {
+    "fast-glob": "^3.3.3",
     "glob": "^11.0.2",
+    "gray-matter": "^4.0.3",
     "prettier": "^3.5.1",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-astro-organize-imports": "^0.4.11",
-    "prettier-plugin-tailwindcss": "^0.6.11"
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "tsx": "^4.19.4"
   },
   "prettier": {
     "semi": false,
