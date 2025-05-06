@@ -32,10 +32,6 @@ export async function getAdjacentPosts(currentId: string): Promise<{
   }
 }
 
-export async function getAllAuthors(): Promise<CollectionEntry<'authors'>[]> {
-  return await getCollection('authors')
-}
-
 export async function getAllProjects(): Promise<CollectionEntry<'projects'>[]> {
   const projects = await getCollection('projects')
   return projects.sort((a, b) => {
