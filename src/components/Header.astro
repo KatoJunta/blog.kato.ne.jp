@@ -1,5 +1,6 @@
 ---
 import Link from '@/components/Link.astro'
+import SearchButton from '@/components/SearchButton.astro'
 import ThemeToggle from '@/components/ThemeToggle.astro'
 import MobileMenu from '@/components/ui/mobile-menu'
 import { NAV_LINKS, SITE } from '@/consts'
@@ -28,6 +29,7 @@ import { NAV_LINKS, SITE } from '@/consts'
           ))
         }
       </nav>
+      <SearchButton />
       <MobileMenu client:load transition:persist />
       <ThemeToggle transition:persist />
     </div>

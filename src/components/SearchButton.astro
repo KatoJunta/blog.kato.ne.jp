@@ -1,0 +1,574 @@
+---
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Icon } from 'astro-icon/components'
+---
+
+<div class="search-button-wrapper" transition:persist>
+  <button
+    id="search-button"
+    aria-label="サイト内検索"
+    class={cn(
+      buttonVariants({ variant: 'ghost', size: 'sm' }),
+      'flex items-center gap-1.5 text-foreground/60 hover:text-foreground/80',
+    )}
+  >
+    <Icon name="lucide:search" class="size-4" />
+  </button>
+
+  <div id="search-modal" class="search-modal hidden">
+    <div class="search-modal-backdrop"></div>
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <h2>サイト内検索</h2>
+        <button id="close-search-modal" aria-label="検索を閉じる">
+          <Icon name="lucide:x" class="size-5" />
+        </button>
+      </div>
+      <div id="search" class="search-container"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+  }
+
+  .search-modal.hidden {
+    display: none;
+  }
+
+  .search-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 101;
+  }
+
+  .search-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    margin-top: 5rem;
+    background-color: var(--background);
+    border-radius: 0.5rem;
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 102;
+  }
+
+  /* モバイル向けのメディアクエリ */
+  @media screen and (max-width: 768px) {
+    .search-modal-content {
+      width: 95%;
+      max-height: 70vh;
+      margin-top: 2rem;
+    }
+  }
+
+  /* 小さい画面サイズ向けのさらなる調整 */
+  @media screen and (max-height: 600px) {
+    .search-modal-content {
+      max-height: 85vh;
+      margin-top: 1rem;
+    }
+  }
+
+  .search-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background-color: var(--background);
+    z-index: 20;
+  }
+
+  .search-modal-header h2 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .search-modal-header button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted-foreground);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    margin: -0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  .search-modal-header button:hover {
+    color: var(--foreground);
+    background-color: var(--accent);
+  }
+
+  .search-container {
+    padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Pagefind UI custom styles to match theme */
+  :global(.search-button-wrapper) {
+    --pagefind-ui-scale: 0.95;
+    --pagefind-ui-primary: var(--primary);
+    --pagefind-ui-text: var(--foreground);
+    --pagefind-ui-background: var(--background);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--secondary);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 0.5rem;
+    --pagefind-ui-image-border-radius: 0.5rem;
+    --pagefind-ui-image-box-ratio: 3 / 2;
+    --pagefind-ui-font: var(--font-sans);
+    --pagefind-ui-button-text: var(--primary-foreground);
+    --pagefind-ui-button-hover-text: var(--primary-foreground);
+    --pagefind-ui-button-hover-background: var(--primary);
+    --pagefind-ui-input-background: var(--secondary);
+    --pagefind-ui-active-text: var(--primary);
+    --pagefind-ui-highlight-background: oklch(0.98 0.2 90 / 0.2);
+    --pagefind-ui-highlight-text: var(--primary);
+    --pagefind-ui-result-background: var(--background);
+    --pagefind-ui-result-border: var(--border);
+    --pagefind-ui-result-hover-background: var(--secondary);
+    --pagefind-ui-result-hover-border: var(--secondary);
+    /* スクロール改善のためのカスタムプロパティ */
+    --pagefind-ui-modal-height: calc(80vh - 8rem);
+  }
+
+  /* モバイル向けのカスタムプロパティ調整 */
+  @media screen and (max-width: 768px) {
+    :global(.search-button-wrapper) {
+      --pagefind-ui-modal-height: calc(65vh - 6rem);
+    }
+  }
+
+  @media screen and (max-height: 600px) {
+    :global(.search-button-wrapper) {
+      --pagefind-ui-modal-height: calc(75vh - 5rem);
+    }
+  }
+
+  /* Additional dark mode styles for Pagefind UI */
+  :global(.dark .search-button-wrapper) {
+    --pagefind-ui-text: var(--foreground);
+    --pagefind-ui-background: var(--background);
+    --pagefind-ui-border: var(--border);
+    --pagefind-ui-tag: var(--secondary);
+    --pagefind-ui-input-background: var(--secondary);
+    --pagefind-ui-highlight-background: oklch(0.4 0.2 90 / 0.2);
+    --pagefind-ui-result-background: var(--background);
+    --pagefind-ui-result-border: var(--border);
+    --pagefind-ui-result-hover-background: var(--secondary);
+    --pagefind-ui-result-hover-border: var(--muted);
+  }
+
+  /* カスタムスタイルオーバーライド */
+  :global(.pagefind-ui__search-input) {
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    padding-right: 4rem !important; /* クリアボタン用のスペースを確保 */
+    height: 2.75rem !important; /* 入力欄の高さを固定 */
+  }
+
+  :global(.pagefind-ui__form) {
+    width: 100% !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 1rem !important; /* 検索フォームと結果の間にスペースを確保 */
+  }
+
+  /* 検索フォーム内の入力欄部分を固定 */
+  :global(.pagefind-ui__search-input-wrapper) {
+    position: relative !important;
+    width: 100% !important;
+    z-index: 10 !important;
+  }
+
+  :global(.pagefind-ui__search-clear) {
+    z-index: 20 !important; /* 確実に最前面に表示 */
+    position: absolute !important;
+    right: 1rem !important;
+    top: 1.375rem !important; /* 固定位置に変更 - 入力欄の高さ(2.75rem)の半分 */
+    transform: translateY(-50%) !important; /* 上下中央に調整 */
+    background: none !important;
+    border: none !important;
+    padding: 0.25rem 0.5rem !important;
+    color: var(--muted-foreground) !important;
+    cursor: pointer !important;
+    font-size: 0.875rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 0.25rem !important;
+    height: 1.75rem !important; /* ボタンの高さを明示的に指定 */
+    line-height: 1 !important; /* 行間を調整 */
+    width: auto !important;
+    min-width: auto !important;
+    margin: 0 !important;
+    opacity: 0.8 !important;
+  }
+
+  /* クリアボタンの位置を検索フォーム内に固定 */
+  :global(.pagefind-ui__form::after) {
+    content: '' !important;
+    display: block !important;
+    position: relative !important;
+    height: 0 !important; /* 高さを0に設定 */
+    width: 100% !important;
+    clear: both !important; /* フロート解除 */
+  }
+
+  :global(.pagefind-ui .pagefind-ui__search-clear:hover) {
+    color: var(--foreground) !important;
+    background-color: var(--accent) !important;
+    opacity: 1 !important;
+  }
+
+  :global(.pagefind-ui__result) {
+    padding: 1rem !important;
+    margin-bottom: 0.75rem !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+  }
+
+  :global(.pagefind-ui__message) {
+    padding: 1rem 0 !important;
+  }
+
+  :global(.pagefind-ui__button) {
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  :global(.pagefind-ui__result-title) {
+    font-size: 1.125rem !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 500 !important;
+  }
+
+  :global(.pagefind-ui__result-excerpt) {
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* 本文リンクのスタイル */
+  :global(.pagefind-ui__result-excerpt-link) {
+    color: inherit !important;
+    text-decoration: none !important;
+    display: block !important;
+  }
+
+  :global(.pagefind-ui__result:hover .pagefind-ui__result-excerpt-link) {
+    color: var(--foreground) !important;
+  }
+
+  :global(.pagefind-ui__results-pagination) {
+    margin-top: 1.5rem !important;
+  }
+
+  :global(.pagefind-ui__results-clear) {
+    opacity: 0.8 !important;
+  }
+
+  :global(.pagefind-ui__results-clear:hover) {
+    opacity: 1 !important;
+  }
+
+  /* 重複UI要素修正用スタイル */
+  :global(.pagefind-ui .pagefind-ui__drawer) {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    overflow-y: visible !important;
+  }
+
+  /* スクロール時のコンテンツ表示改善 */
+  :global(.pagefind-ui) {
+    --pagefind-ui-background: var(--background);
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+  }
+
+  /* 検索結果コンテナのスタイル */
+  :global(.pagefind-ui__results) {
+    margin-top: 0.5rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overflow-y: auto !important;
+    max-height: var(--pagefind-ui-modal-height) !important;
+  }
+
+  /* モバイル向けに結果表示を最適化 */
+  @media screen and (max-width: 768px) {
+    :global(.pagefind-ui__result) {
+      padding: 0.75rem !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    :global(.pagefind-ui__result-title) {
+      font-size: 1rem !important;
+      margin-bottom: 0.25rem !important;
+    }
+
+    :global(.pagefind-ui__result-excerpt) {
+      font-size: 0.8125rem !important;
+      line-height: 1.4 !important;
+    }
+
+    /* 検索入力欄のモバイル最適化 */
+    :global(.pagefind-ui__search-input) {
+      padding: 0.625rem 0.875rem !important;
+      font-size: 0.9375rem !important;
+      height: 2.5rem !important;
+      padding-right: 3.5rem !important;
+    }
+
+    /* クリアボタンの位置調整 */
+    :global(.pagefind-ui__search-clear) {
+      right: 0.75rem !important;
+      top: 1.25rem !important;
+      height: 1.5rem !important;
+    }
+
+    /* ボタンのサイズ調整 */
+    :global(.pagefind-ui__button) {
+      padding: 0.375rem 0.75rem !important;
+      font-size: 0.875rem !important;
+    }
+
+    /* ページネーションの余白調整 */
+    :global(.pagefind-ui__results-pagination) {
+      margin-top: 1rem !important;
+    }
+  }
+</style>
+
+<script>
+  import { PagefindUI } from '@pagefind/default-ui'
+
+  document.addEventListener('astro:page-load', () => {
+    const searchButton = document.getElementById('search-button')
+    const searchModal = document.getElementById('search-modal')
+    const closeButton = document.getElementById('close-search-modal')
+    const searchContainer = document.getElementById('search')
+    const backdrop = document.querySelector(
+      '.search-modal-backdrop',
+    ) as HTMLElement
+
+    if (!searchButton || !searchModal || !closeButton || !searchContainer)
+      return
+
+    let isInitialized = false
+
+    // 検索モーダルを閉じる関数
+    const closeSearchModal = () => {
+      searchModal.classList.add('hidden')
+      document.body.style.overflow = ''
+    }
+
+    // 検索結果要素にクリックイベントを追加する関数
+    const addClickEventToResults = () => {
+      const resultElements = searchModal.querySelectorAll(
+        '.pagefind-ui__result',
+      )
+      resultElements.forEach((result) => {
+        // 既にイベントが設定されていないことを確認
+        if (!result.hasAttribute('data-click-event-added')) {
+          result.setAttribute('data-click-event-added', 'true')
+          result.addEventListener('click', () => {
+            // リンククリックを少し遅らせてから閉じる
+            setTimeout(closeSearchModal, 100)
+          })
+
+          // 本文部分にもリンクスタイルを適用
+          const titleLink = result.querySelector('.pagefind-ui__result-title a')
+          const excerpt = result.querySelector('.pagefind-ui__result-excerpt')
+
+          if (titleLink && excerpt) {
+            const href = titleLink.getAttribute('href')
+            // 元のテキストを保持
+            const originalText = excerpt.innerHTML
+
+            // 本文全体をリンクで囲む
+            excerpt.innerHTML = `<a href="${href}" class="pagefind-ui__result-excerpt-link">${originalText}</a>`
+          }
+        }
+      })
+    }
+
+    // 検索結果の要素が動的に追加されるのを監視
+    const setupResultsObserver = () => {
+      const resultsContainer = searchModal.querySelector(
+        '.pagefind-ui__results',
+      )
+      if (!resultsContainer) return
+
+      const observer = new MutationObserver(() => {
+        addClickEventToResults()
+
+        // スクロール問題改善のため、結果が追加された後にz-indexを調整
+        const header = searchModal.querySelector('.search-modal-header')
+        if (header) {
+          header.setAttribute('style', 'z-index: 30 !important')
+        }
+      })
+
+      observer.observe(resultsContainer, {
+        childList: true,
+        subtree: true,
+      })
+    }
+
+    // Open search modal
+    searchButton.addEventListener('click', () => {
+      searchModal.classList.remove('hidden')
+      document.body.style.overflow = 'hidden'
+
+      // バックドロップのサイズを調整
+      if (backdrop) {
+        backdrop.style.height = `${Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          document.body.offsetHeight,
+          document.documentElement.offsetHeight,
+          document.body.clientHeight,
+          document.documentElement.clientHeight,
+        )}px`
+      }
+
+      // デバイスサイズに基づいてモーダルコンテンツの位置とサイズを調整
+      const modalContent = searchModal.querySelector(
+        '.search-modal-content',
+      ) as HTMLElement
+      if (modalContent) {
+        // モバイルデバイスの場合、より良い表示位置に調整
+        if (window.innerWidth <= 768) {
+          // ビューポートの高さに基づいて調整
+          const viewportHeight = window.innerHeight
+          if (viewportHeight < 600) {
+            // 特に小さい画面の場合
+            modalContent.style.marginTop = '0.5rem'
+            modalContent.style.maxHeight = 'calc(90vh - 1rem)'
+          } else {
+            modalContent.style.marginTop = '1.5rem'
+          }
+        }
+      }
+
+      // Initialize PagefindUI if not already initialized
+      if (!isInitialized) {
+        // 既存の検索UI要素をクリア
+        searchContainer.innerHTML = ''
+
+        new PagefindUI({
+          element: '#search',
+          showImages: true,
+          resetStyles: false,
+          autofocus: true,
+          translations: {
+            placeholder: 'サイト内を検索',
+            clear_search: 'クリア',
+            load_more: 'もっと読み込む',
+            search_label: 'サイト内検索',
+            filters_label: 'フィルター',
+            zero_results: '[SEARCH_TERM]の検索結果は見つかりませんでした',
+            many_results: '[SEARCH_TERM]の検索結果が[COUNT]件見つかりました',
+            one_result: '[SEARCH_TERM]の検索結果が1件見つかりました',
+            searching: '[SEARCH_TERM]を検索中...',
+            search_suggestion:
+              '[SEARCH_TERM]の検索結果は見つかりませんでした。次の検索を試してみてください',
+            searching_for: '[SEARCH_TERM]を検索中',
+            search_results: '[SEARCH_TERM]の検索結果',
+            alt_search:
+              '[SEARCH_TERM]の検索結果は見つかりませんでした。[DIFFERENT_TERM]の検索結果を表示しています',
+          },
+        })
+
+        isInitialized = true
+
+        // UIが完全に初期化されるのを待ってから監視を開始
+        setTimeout(() => {
+          setupResultsObserver()
+          addClickEventToResults()
+        }, 300)
+      } else {
+        // 既に初期化されている場合も検索結果クリックのイベントリスナーを確認
+        setTimeout(() => {
+          addClickEventToResults()
+        }, 300)
+      }
+
+      // Focus on search input
+      setTimeout(() => {
+        const searchInput = searchModal.querySelector('input')
+        if (searchInput) searchInput.focus()
+      }, 100)
+    })
+
+    // 検索フォームの入力イベントを監視して結果が更新されたらクリックイベントを再設定
+    document.addEventListener('input', (event) => {
+      const target = event.target as HTMLElement
+      if (target.closest('.pagefind-ui__search-input')) {
+        setTimeout(addClickEventToResults, 500)
+      }
+    })
+
+    // Close search modal
+    closeButton.addEventListener('click', closeSearchModal)
+
+    // Close modal on backdrop click
+    searchModal.addEventListener('click', (event) => {
+      if (
+        event.target === searchModal ||
+        event.target === searchModal.querySelector('.search-modal-backdrop')
+      ) {
+        closeSearchModal()
+      }
+    })
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !searchModal.classList.contains('hidden')) {
+        closeSearchModal()
+      }
+    })
+  })
+</script>
