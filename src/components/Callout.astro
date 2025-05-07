@@ -2,6 +2,7 @@
 import { cn } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { cva, type VariantProps } from 'class-variance-authority'
+import Tweet from './Tweet.astro'
 
 const calloutConfig = {
   note: {
@@ -28,6 +29,11 @@ const calloutConfig = {
     style: 'border-purple-500 dark:bg-purple-950/5',
     textColor: 'text-purple-700 dark:text-purple-300',
     icon: 'lucide:message-square-warning',
+  },
+  tweet: {
+    style: 'border-sky-400 dark:bg-sky-950/5',
+    textColor: 'text-sky-600 dark:text-sky-300',
+    icon: 'lucide:twitter',
   },
   definition: {
     style: 'border-teal-600 dark:bg-teal-950/10',
@@ -144,9 +150,20 @@ interface Props extends VariantProps<typeof calloutVariants> {
   class?: string
   variant?: keyof typeof calloutConfig
   defaultOpen?: boolean
+  tweetId?: string
+  tweetLang?: string
+  tweetDir?: string
 }
 
-const { title, variant = 'note', defaultOpen = true, ...rest } = Astro.props
+const {
+  title,
+  variant = 'note',
+  defaultOpen = true,
+  tweetId,
+  tweetLang = 'ja',
+  tweetDir = 'ltr',
+  ...rest
+} = Astro.props
 ---
 
 <details
@@ -178,6 +195,12 @@ const { title, variant = 'note', defaultOpen = true, ...rest } = Astro.props
     />
   </summary>
   <div>
-    <slot />
+    {
+      variant === 'tweet' && tweetId ? (
+        <Tweet id={tweetId} lang={tweetLang} dir={tweetDir} />
+      ) : (
+        <slot />
+      )
+    }
   </div>
 </details>

@@ -1,0 +1,25 @@
+---
+interface Props {
+  id: string
+  lang?: string
+  dir?: string
+}
+
+const { id, lang = 'ja', dir = 'ltr' } = Astro.props
+---
+
+<div class="tweet-embed" data-tweet-id={id}>
+  <blockquote class="twitter-tweet" data-lang={lang} dir={dir}>
+    <a href={`https://twitter.com/x/status/${id}`}>Loading tweet...</a>
+  </blockquote>
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"
+  ></script>
+</div>
+
+<style>
+  .tweet-embed {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+</style>
