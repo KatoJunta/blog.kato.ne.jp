@@ -17,6 +17,17 @@ function hashContent(content) {
   return crypto.createHash('md5').update(content).digest('hex')
 }
 
+// 句読点での改行を防止する関数
+function formatTitleText(title) {
+  // 句読点、括弧などの前に改行させないよう非改行スペースを挿入
+  return title
+    .replace(
+      /([\u3001\u3002\uff01\uff1f\u300c\u300d\u3001\u3002\uff0c\uff0e\u201c\u201d])/g,
+      '\u00A0$1',
+    )
+    .replace(/([\/\-])/g, '$1\u200B') // スラッシュやハイフンの後に任意の改行ポイントを挿入
+}
+
 // ハッシュを保存する関数
 function saveContentHash(filePath, titleHash, contentHash) {
   const dirPath = path.dirname(filePath)
@@ -86,6 +97,9 @@ async function generateOgImages() {
       // front-matterからデータを取得
       const title = data.title || 'No Title'
       const description = data.description || ''
+
+      // タイトルの改行を最適化
+      const formattedTitle = formatTitleText(title)
 
       // タイトルとコンテンツをハッシュ化
       const titleHash = hashContent(title)
@@ -177,19 +191,44 @@ async function generateOgImages() {
               </span>
             </div>
 
-            {/* 中央タイトル（カードなし） */}
+            {/* タイトル */}
             <div
               style={{
                 color: '#ffffff',
-                fontSize: 72,
-                lineHeight: 1.3,
-                maxWidth: 820,
-                textAlign: 'center',
-                textShadow: '0 4px 12px rgba(0,0,0,0.6)',
-                padding: '0 60px',
+                width: '100%',
+                maxWidth: 1080,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                padding: '0 80px 0 80px',
+                boxSizing: 'border-box',
               }}
             >
-              {title}
+              <div
+                style={{
+                  fontSize:
+                    title.length > 50
+                      ? 48
+                      : title.length > 40
+                        ? 54
+                        : title.length > 30
+                          ? 60
+                          : title.length > 20
+                            ? 66
+                            : 72,
+                  lineHeight: title.length > 30 ? 1.3 : 1.4,
+                  fontWeight: 800,
+                  textAlign: 'left',
+                  textShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                  padding: 0,
+                  wordBreak: 'keep-all',
+                  overflowWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                  wordSpacing: '0.01em',
+                }}
+              >
+                {formattedTitle}
+              </div>
             </div>
           </div>
         ),
