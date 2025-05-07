@@ -8,7 +8,7 @@
     "start": "astro dev",
     "gen:ogp": "tsx scripts/gen-ogp.tsx",
     "prebuild": "npm run gen:ogp",
-    "build": "astro check && astro build && npx pagefind --site dist --glob \"posts/**/*.html\"",
+    "build": "astro check && astro build && npx pagefind --site dist --force-language ja --glob \"posts/**/*.html\"",
     "preview": "astro preview",
     "astro": "astro",
     "prettier": "prettier --write **/*.{ts,tsx,css,astro} --ignore-path .gitignore",
