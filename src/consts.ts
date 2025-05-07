@@ -5,7 +5,7 @@ export const SITE: Site = {
   description: '雑多な書き物 authored by Junta Kato.',
   href: 'https://blog.kato.ne.jp',
   author: 'Junta Kato',
-  locale: 'ja-JP',
+  locale: 'ja',
   featuredPostCount: 4,
   postsPerPage: 5,
 }
