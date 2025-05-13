@@ -2,6 +2,7 @@
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PostHead from '@/components/PostHead.astro'
 import PostNavigation from '@/components/PostNavigation.astro'
+import ShareButtons from '@/components/ShareButtons'
 import TableOfContents from '@/components/TableOfContents.astro'
 import { badgeVariants } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,7 @@ const currentPostId = Astro.params.id
 const { Content, headings } = await render(post)
 const { next, prev } = await getAdjacentPosts(currentPostId)
 const authors = await parseAuthors(post.data.authors ?? [])
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <Layout isWide>
@@ -112,6 +114,15 @@ const authors = await parseAuthors(post.data.authors ?? [])
     <article class="prose col-start-2 max-w-none" data-pagefind-body>
       <Content />
     </article>
+
+    <div class="col-start-2 mt-8">
+      <h3 class="mb-4 text-center text-lg font-medium">この記事をシェアする</h3>
+      <ShareButtons
+        client:load
+        url={canonicalURL.toString()}
+        title={post.data.title}
+      />
+    </div>
 
     <PostNavigation prevPost={prev} nextPost={next} />
   </section>
