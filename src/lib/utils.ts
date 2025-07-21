@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { decodeTime } from 'ulid'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -18,4 +19,25 @@ export function readingTime(html: string) {
   const wordCount = textOnly.split(/\s+/).length
   const readingTimeMinutes = (wordCount / 200 + 1).toFixed()
   return `約 ${readingTimeMinutes} 分で読めます`
+}
+
+export function extractTimeFromUlid(ulid: string): string {
+  try {
+    const timestamp = decodeTime(ulid)
+    const date = new Date(timestamp)
+
+    // 日本時間に変換して時刻フォーマット
+    return (
+      Intl.DateTimeFormat('ja-JP', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Tokyo',
+      })
+        .format(date)
+        .replace(':', '時') + '分'
+    )
+  } catch (error) {
+    // ULIDでない場合は空文字を返す
+    return ''
+  }
 }

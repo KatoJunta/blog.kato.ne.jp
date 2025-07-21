@@ -61,7 +61,7 @@
     "prettier-plugin-astro-organize-imports": "^0.4.11",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tsx": "^4.19.4",
-    "ulid": "^3.0.0",
+    "ulid": "^3.0.1",
     "wrangler": "^4.14.1"
   },
   "prettier": {

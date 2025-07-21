@@ -2,7 +2,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { parseAuthors } from '@/lib/data-utils'
-import { formatDate, readingTime } from '@/lib/utils'
+import { extractTimeFromUlid, formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
@@ -14,6 +14,8 @@ interface Props {
 
 const { entry } = Astro.props
 const formattedDate = formatDate(entry.data.date)
+const timeStr = extractTimeFromUlid(entry.id)
+const dateTimeStr = timeStr ? `${formattedDate} ${timeStr}` : formattedDate
 const readTime = readingTime(entry.body!)
 const authors = await parseAuthors(entry.data.authors ?? [])
 ---
@@ -58,7 +60,7 @@ const authors = await parseAuthors(entry.data.authors ?? [])
             </>
           )
         }
-        <span>{formattedDate}</span>
+        <span>{dateTimeStr}</span>
         <Separator orientation="vertical" className="h-4!" />
         <span>{readTime}</span>
       </div>

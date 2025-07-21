@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import Layout from '@/layouts/Layout.astro'
 import { getAdjacentPosts, getAllPosts, parseAuthors } from '@/lib/data-utils'
-import { formatDate, readingTime } from '@/lib/utils'
+import { extractTimeFromUlid, formatDate, readingTime } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import { render } from 'astro:content'
@@ -80,7 +80,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
             )
           }
           <div class="flex items-center gap-2">
-            <span>{formatDate(post.data.date)}</span>
+            <span
+              >{formatDate(post.data.date)}{
+                extractTimeFromUlid(post.id)
+                  ? ` ${extractTimeFromUlid(post.id)}`
+                  : ''
+              }</span
+            >
             <Separator orientation="vertical" className="h-4!" />
             <span>{readingTime(post.body!)}</span>
           </div>

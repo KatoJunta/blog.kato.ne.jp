@@ -5,7 +5,15 @@ export async function getAllPosts(): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getCollection('posts')
   return posts
     .filter((post) => !post.data.draft)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+    .sort((a, b) => {
+      // まず日付で降順ソート（新しい順）
+      const dateCompare = b.data.date.valueOf() - a.data.date.valueOf()
+      if (dateCompare !== 0) {
+        return dateCompare
+      }
+      // 日付が同じ場合はIDで降順ソート（ULID形式なら後の方が新しい）
+      return b.id.localeCompare(a.id)
+    })
 }
 
 export async function getRecentPosts(
