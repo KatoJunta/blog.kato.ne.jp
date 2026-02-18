@@ -12,28 +12,23 @@ const OG_IMAGE_WIDTH = 1200
 const OG_IMAGE_HEIGHT = 630
 const HASH_FILE_NAME = 'content-hash.json'
 
-// コンテンツをハッシュ化する関数
 function hashContent(content) {
   return crypto.createHash('md5').update(content).digest('hex')
 }
 
-// 句読点での改行を防止する関数
 function formatTitleText(title) {
-  // 句読点、括弧などの前に改行させないよう非改行スペースを挿入
   return title
     .replace(
       /([\u3001\u3002\uff01\uff1f\u300c\u300d\u3001\u3002\uff0c\uff0e\u201c\u201d])/g,
       '\u00A0$1',
     )
-    .replace(/([\/\-])/g, '$1\u200B') // スラッシュやハイフンの後に任意の改行ポイントを挿入
+    .replace(/([\/\-])/g, '$1\u200B')
 }
 
-// ハッシュを保存する関数
 function saveContentHash(filePath, titleHash, contentHash) {
   const dirPath = path.dirname(filePath)
   const hashFilePath = path.join(dirPath, HASH_FILE_NAME)
 
-  // 既存のハッシュデータを読み込むか、新しいオブジェクトを作成
   let hashData = {}
   if (fs.existsSync(hashFilePath)) {
     try {
@@ -45,21 +40,17 @@ function saveContentHash(filePath, titleHash, contentHash) {
     }
   }
 
-  // ハッシュデータを更新
   hashData.titleHash = titleHash
   hashData.contentHash = contentHash
   hashData.lastGenerated = new Date().toISOString()
 
-  // ハッシュデータを保存
   fs.writeFileSync(hashFilePath, JSON.stringify(hashData, null, 2))
 }
 
-// ハッシュを比較する関数
 function compareContentHash(filePath, titleHash, contentHash) {
   const dirPath = path.dirname(filePath)
   const hashFilePath = path.join(dirPath, HASH_FILE_NAME)
 
-  // ハッシュファイルが存在しない場合は変更ありと判断
   if (!fs.existsSync(hashFilePath)) {
     return true
   }
@@ -67,13 +58,12 @@ function compareContentHash(filePath, titleHash, contentHash) {
   try {
     const hashData = JSON.parse(fs.readFileSync(hashFilePath, 'utf-8'))
 
-    // タイトルまたはコンテンツのハッシュが変更されているか確認
     return (
       hashData.titleHash !== titleHash || hashData.contentHash !== contentHash
     )
   } catch (error) {
     console.warn(`⚠️ ハッシュファイルの比較に失敗しました: ${hashFilePath}`)
-    return true // エラーの場合は変更ありと判断
+    return true
   }
 }
 
@@ -81,7 +71,6 @@ async function generateOgImages() {
   try {
     console.log('🖼️ OGP画像の生成を開始します...')
 
-    // MDとMDXファイルのパスを取得
     const contentFiles = await glob('**/*.{md,mdx}', {
       cwd: CONTENT_DIR,
       absolute: false,
@@ -94,29 +83,23 @@ async function generateOgImages() {
       const content = fs.readFileSync(fullPath, 'utf-8')
       const { data } = matter(content)
 
-      // front-matterからデータを取得
       const title = data.title || 'No Title'
       const description = data.description || ''
 
-      // タイトルの改行を最適化
       const formattedTitle = formatTitleText(title)
 
-      // タイトルとコンテンツをハッシュ化
       const titleHash = hashContent(title)
       const contentHash = hashContent(content)
 
-      // ディレクトリパスを取得（ファイル名を除く）
       const dirPath = path.dirname(fullPath)
       const ogpFilePath = path.join(dirPath, 'ogp.png')
 
-      // コンテンツが変更されていないか確認
       const contentChanged = compareContentHash(
         fullPath,
         titleHash,
         contentHash,
       )
 
-      // 既存のOGP画像があり、コンテンツが変更されていない場合はスキップ
       if (fs.existsSync(ogpFilePath) && !contentChanged) {
         console.log(`⏭️ コンテンツ未変更のためスキップ: ${ogpFilePath}`)
         continue
@@ -124,10 +107,8 @@ async function generateOgImages() {
 
       console.log(`🔄 OGP画像を生成中: ${ogpFilePath}`)
 
-      // React要素を使用してOGP画像を生成
       const ogImage = new ImageResponse(
         (
-          /* vercel og?playground 1200×630 ─ カード無しシンプル版 */
           <div
             style={{
               width: 1200,
@@ -142,7 +123,6 @@ async function generateOgImages() {
               background: 'linear-gradient(135deg,#0e0f12 0%,#1a1c22 100%)',
             }}
           >
-            {/* 背景アクセント */}
             <div
               style={{
                 position: 'absolute',
@@ -166,7 +146,6 @@ async function generateOgImages() {
               }}
             />
 
-            {/* ロゴ＋ドメイン */}
             <div
               style={{
                 position: 'absolute',
@@ -191,7 +170,6 @@ async function generateOgImages() {
               </span>
             </div>
 
-            {/* タイトル */}
             <div
               style={{
                 color: '#ffffff',
@@ -238,14 +216,11 @@ async function generateOgImages() {
         },
       )
 
-      // バッファに変換して保存
       const arrayBuffer = await ogImage.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
 
-      // ファイルに保存
       fs.writeFileSync(ogpFilePath, buffer)
 
-      // ハッシュを保存
       saveContentHash(fullPath, titleHash, contentHash)
 
       console.log(`✅ OGP画像を生成しました: ${ogpFilePath}`)
@@ -258,5 +233,4 @@ async function generateOgImages() {
   }
 }
 
-// スクリプト実行
 generateOgImages()

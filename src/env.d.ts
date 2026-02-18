@@ -1,7 +1,6 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 
-// Pagefind UI モジュールの型定義
 declare module '@pagefind/default-ui' {
   export class PagefindUI {
     constructor(options: {

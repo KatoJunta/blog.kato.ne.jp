@@ -1,35 +1,51 @@
 ---
 import { SITE } from '@/consts'
+import {
+  buildBaseMeta,
+  resolveCanonicalUrl,
+  resolveMetaImageUrl,
+} from '@/lib/meta-utils'
 
 interface Props {
   title?: string
   description?: string
   isIndex?: boolean
+  canonicalUrl?: URL | string
 }
 
 const {
   title = SITE.title,
   description = SITE.description,
   isIndex = false,
+  canonicalUrl = resolveCanonicalUrl(Astro.url.pathname, Astro.site),
 } = Astro.props
-const image = new URL('/static/1200x630.png', Astro.site)
+const imageUrl = resolveMetaImageUrl({
+  site: Astro.site,
+})
+const meta = buildBaseMeta({
+  title,
+  description,
+  canonicalUrl,
+  imageUrl,
+  isIndex,
+})
 ---
 
-<title>{isIndex ? SITE.title : `${title} | ${SITE.title}`}</title>
-<meta name="description" content={description} />
-<link rel="canonical" href={SITE.href} />
+<title>{meta.documentTitle}</title>
+<meta name="description" content={meta.description} />
+<link rel="canonical" href={meta.canonicalUrl} />
 
-<meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
-<meta property="og:image" content={image} />
-<meta property="og:image:alt" content={title} />
+<meta property="og:title" content={meta.title} />
+<meta property="og:description" content={meta.description} />
+<meta property="og:image" content={meta.imageUrl} />
+<meta property="og:image:alt" content={meta.title} />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content={SITE.locale} />
 <meta property="og:site_name" content={SITE.title} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={meta.ogUrl} />
 
-<meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={image} />
-<meta name="twitter:image:alt" content={title} />
+<meta name="twitter:title" content={meta.title} />
+<meta name="twitter:description" content={meta.description} />
+<meta name="twitter:image" content={meta.imageUrl} />
+<meta name="twitter:image:alt" content={meta.title} />
 <meta name="twitter:card" content="summary_large_image" />

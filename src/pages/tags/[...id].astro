@@ -3,25 +3,31 @@ import BlogCard from '@/components/BlogCard.astro'
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
-import { getAllTags, getPostsByTag } from '@/lib/data-utils'
+import { getAllPosts } from '@/lib/data-utils'
 import { Icon } from 'astro-icon/components'
 
 export async function getStaticPaths() {
-  const tagMap = await getAllTags()
-  const uniqueTags = Array.from(tagMap.keys())
+  const posts = await getAllPosts()
+  const postsByTag = new Map<string, typeof posts>()
 
-  return Promise.all(
-    uniqueTags.map(async (tag) => {
-      const posts = await getPostsByTag(tag)
-      return {
-        params: { id: tag },
-        props: {
-          tag,
-          posts,
-        },
+  for (const post of posts) {
+    for (const tag of post.data.tags ?? []) {
+      const taggedPosts = postsByTag.get(tag)
+      if (taggedPosts) {
+        taggedPosts.push(post)
+      } else {
+        postsByTag.set(tag, [post])
       }
-    }),
-  )
+    }
+  }
+
+  return [...postsByTag.entries()].map(([tag, taggedPosts]) => ({
+    params: { id: tag },
+    props: {
+      tag,
+      posts: taggedPosts,
+    },
+  }))
 }
 
 const { tag, posts } = Astro.props

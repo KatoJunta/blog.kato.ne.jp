@@ -20,12 +20,9 @@ const { id, lang = 'ja', dir = 'ltr' } = Astro.props
 </div>
 
 <script is:inline>
-  // ページ遷移後にTwitterウィジェットを再初期化する
+  // Astro遷移後も埋め込みを再描画する
   document.addEventListener('astro:page-load', () => {
-    // twttrオブジェクトが存在する場合のみ実行
-    if (window.twttr && window.twttr.widgets) {
-      window.twttr.widgets.load()
-    }
+    window.twttr?.widgets?.load()
   })
 </script>
 

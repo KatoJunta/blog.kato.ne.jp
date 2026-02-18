@@ -31,7 +31,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
 ---
 
 <Layout isWide>
-  <PostHead slot="head" post={post} />
+  <PostHead slot="head" post={post} canonicalUrl={canonicalURL} />
   <section
     class="grid grid-cols-[minmax(0px,1fr)_min(calc(var(--breakpoint-md)-2rem),100%)_minmax(0px,1fr)] gap-y-6"
   >
@@ -124,7 +124,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site)
     <div class="col-start-2 mt-8">
       <h3 class="mb-4 text-center text-lg font-medium">この記事をシェアする</h3>
       <ShareButtons
-        client:load
+        client:visible
         url={canonicalURL.toString()}
         title={post.data.title}
       />

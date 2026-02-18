@@ -26,7 +26,6 @@ export function extractTimeFromUlid(ulid: string): string {
     const timestamp = decodeTime(ulid)
     const date = new Date(timestamp)
 
-    // 日本時間に変換して時刻フォーマット
     return (
       Intl.DateTimeFormat('ja-JP', {
         hour: '2-digit',
@@ -37,7 +36,6 @@ export function extractTimeFromUlid(ulid: string): string {
         .replace(':', '時') + '分'
     )
   } catch (error) {
-    // ULIDでない場合は空文字を返す
     return ''
   }
 }

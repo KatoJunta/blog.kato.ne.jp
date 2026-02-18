@@ -2,17 +2,10 @@ import { mkdirSync, writeFileSync } from 'fs'
 import { join } from 'path'
 import { ulid } from 'ulid'
 
-// コンテンツディレクトリのパス
 const CONTENT_DIR = join(process.cwd(), 'src', 'content', 'posts')
-
-// ULIDを使用して新しいフォルダ名を生成
 const folderName = ulid().toLowerCase()
 const folderPath = join(CONTENT_DIR, folderName)
-
-// フォルダを作成
 mkdirSync(folderPath, { recursive: true })
-
-// 空のindex.mdxファイルを作成
 const mdxContent = `---
 title: 'Your Post Title'
 description: 'A brief description of your post!'

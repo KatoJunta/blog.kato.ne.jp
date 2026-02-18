@@ -1,19 +1,60 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import { AUTHORS } from '@/consts'
 
-export async function getAllPosts(): Promise<CollectionEntry<'posts'>[]> {
-  const posts = await getCollection('posts')
-  return posts
-    .filter((post) => !post.data.draft)
-    .sort((a, b) => {
-      // まず日付で降順ソート（新しい順）
-      const dateCompare = b.data.date.valueOf() - a.data.date.valueOf()
-      if (dateCompare !== 0) {
-        return dateCompare
+type PostEntry = CollectionEntry<'posts'>
+
+let postsCache: PostEntry[] | null = null
+let postsPromise: Promise<PostEntry[]> | null = null
+let tagCountsCache: Map<string, number> | null = null
+let postsByTagCache: Map<string, PostEntry[]> | null = null
+
+function sortPosts(posts: PostEntry[]): PostEntry[] {
+  return posts.sort((a, b) => {
+    const dateCompare = b.data.date.valueOf() - a.data.date.valueOf()
+    if (dateCompare !== 0) {
+      return dateCompare
+    }
+    return b.id.localeCompare(a.id)
+  })
+}
+
+function buildTagCaches(posts: PostEntry[]) {
+  if (tagCountsCache && postsByTagCache) {
+    return
+  }
+
+  const counts = new Map<string, number>()
+  const postsByTag = new Map<string, PostEntry[]>()
+
+  for (const post of posts) {
+    for (const tag of post.data.tags ?? []) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1)
+      const taggedPosts = postsByTag.get(tag)
+      if (taggedPosts) {
+        taggedPosts.push(post)
+      } else {
+        postsByTag.set(tag, [post])
       }
-      // 日付が同じ場合はIDで降順ソート（ULID形式なら後の方が新しい）
-      return b.id.localeCompare(a.id)
-    })
+    }
+  }
+
+  tagCountsCache = counts
+  postsByTagCache = postsByTag
+}
+
+export async function getAllPosts(): Promise<CollectionEntry<'posts'>[]> {
+  if (postsCache) {
+    return postsCache
+  }
+
+  if (!postsPromise) {
+    postsPromise = getCollection('posts').then((posts) =>
+      sortPosts(posts.filter((post) => !post.data.draft)),
+    )
+  }
+
+  postsCache = await postsPromise
+  return postsCache
 }
 
 export async function getRecentPosts(
@@ -51,13 +92,9 @@ export async function getAllProjects(): Promise<CollectionEntry<'projects'>[]> {
 
 export async function getAllTags(): Promise<Map<string, number>> {
   const posts = await getAllPosts()
+  buildTagCaches(posts)
 
-  return posts.reduce((acc, post) => {
-    post.data.tags?.forEach((tag) => {
-      acc.set(tag, (acc.get(tag) || 0) + 1)
-    })
-    return acc
-  }, new Map<string, number>())
+  return new Map(tagCountsCache)
 }
 
 export async function getSortedTags(): Promise<
@@ -108,5 +145,6 @@ export async function getPostsByTag(
   tag: string,
 ): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getAllPosts()
-  return posts.filter((post) => post.data.tags?.includes(tag))
+  buildTagCaches(posts)
+  return postsByTagCache?.get(tag) ?? []
 }
