@@ -4,7 +4,6 @@ import {
   LineShareButton,
   HatenaShareButton,
   FacebookIcon,
-  TwitterIcon,
   LineIcon,
   HatenaIcon,
   XIcon,
