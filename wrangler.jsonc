@@ -1,9 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "astro-erudite",
+  "main": "worker/index.ts",
   "compatibility_date": "2025-08-20",
+  "vars": {
+    "MAINTENANCE_MODE": "true",
+  },
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
+    "run_worker_first": true,
   },
 }
